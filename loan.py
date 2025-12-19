@@ -10,12 +10,16 @@ with open("classifierr.pkl", "rb") as f:
 
 #start creating the endpoints 
 
-@app.route("/predict", methods=['GET'])
+@app.route("/", methods=['GET'])
 def hello():
     return "<h1> Loan Approval Application </h1>"
 
-@app.route("/predict", methods=['POST'])
+@app.route("/predict", methods=['GET'])
 def predict():
+    return "<h1> i will make the predictions </h1>"
+
+@app.route("/predict", methods=['POST'])
+def predict_post():
     loan_req = request.get_json()
     
     if loan_req["Gender"] == "Male":
@@ -28,11 +32,16 @@ def predict():
         married = 1
     
     ApplicantIncome = loan_req["ApplicantIncome"]
-    CreditHistory = loan_req["CreditHistory"]
+    Credit_History = loan_req["Credit_History"]
     LoanAmount = loan_req["LoanAmount"]
-    
-    input_data = [[gender, married, ApplicantIncome, CreditHistory, LoanAmount]]
-    
-    prediction = model.predict(input_data)
 
-    return "Loan Approved" if prediction[0] == 1 else "Loan Not Approved"
+    input_data = [[gender, married, ApplicantIncome, Credit_History, LoanAmount]]
+
+    res = model.predict(input_data)
+    
+    if res[0] == 1:
+        prediction = "Approved"
+    else:
+        prediction = "Rejected"
+
+    return {"Loan_Status": prediction}
